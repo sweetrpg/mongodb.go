@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-	"github.com/sweetrpg/common/logging"
-	"github.com/sweetrpg/db/constants"
+	"github.com/sweetrpg/common.go/logging"
+	"github.com/sweetrpg/db.go/constants"
 )
 
 type DbTestSuite struct {

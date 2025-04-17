@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/sweetrpg/common/logging"
-	"github.com/sweetrpg/db/constants"
+	"github.com/sweetrpg/common.go/logging"
+	"github.com/sweetrpg/db.go/constants"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
