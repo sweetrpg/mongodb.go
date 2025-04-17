@@ -1,17 +1,17 @@
 module github.com/sweetrpg/db
 
-go 1.23.2
+go 1.24.2
 
 require (
 	github.com/stretchr/testify v1.9.0
-	github.com/sweetrpg/common v0.0.7
-	go.mongodb.org/mongo-driver v1.17.1
+	github.com/sweetrpg/common.go v0.0.7
+	go.mongodb.org/mongo-driver v1.17.3
 )
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/golang/snappy v0.0.4 // indirect
-	github.com/klauspost/compress v1.17.11 // indirect
+	github.com/golang/snappy v1.0.0 // indirect
+	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -20,8 +20,8 @@ require (
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	github.com/zerodha/logf v0.5.5 // indirect
-	golang.org/x/crypto v0.31.0 // indirect
-	golang.org/x/sync v0.10.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/crypto v0.37.0 // indirect
+	golang.org/x/sync v0.13.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
