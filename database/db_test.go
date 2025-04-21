@@ -167,14 +167,14 @@ func (suite *DbTestSuite) TestQuery() {
 	// insert docs
 	for i := 0; i < 10; i++ {
 		doc := DBObject{
-			Key:   fmt.Sprintf("key-%d", i),
-			Value: fmt.Sprintf("value-%d", i),
+			Key:   fmt.Sprintf("query-key-%d", i),
+			Value: fmt.Sprintf("query-value-%d", i),
 		}
 		_, err := Insert[DBObject](os.Getenv("TEST_COLLECTION"), doc)
 		assert.NoError(suite.T(), err)
 	}
 
-	filter := bson.D{{}}
+	filter := bson.D{{Key: "key", Value: bson.D{{Key: "$regex", Value: "^query-key-"}}}}
 	sort := bson.D{{Key: "key", Value: 1}} // Sort by key ascending
 	proj := bson.D{{Key: "key", Value: 1}}
 	var start int64 = 1
