@@ -78,7 +78,7 @@ func TeardownDatabase() {
 func Get[T any](collection string, id primitive.ObjectID) (*T, error) {
 	logging.Logger.Debug(fmt.Sprintf("Using '%s' collection on DB", collection))
 	coll := Db.Collection(collection)
-	logging.Logger.Debug(fmt.Sprintf("collection=%v", coll)) // TODO: remove
+	logging.Logger.Debug(fmt.Sprintf("collection=%+v", coll)) // TODO: remove
 
 	// objectId, err := primitive.ObjectIDFromHex(id)
 	// if err != nil {
@@ -94,23 +94,23 @@ func Get[T any](collection string, id primitive.ObjectID) (*T, error) {
 			return nil, nil
 		}
 
-		logging.Logger.Error(fmt.Sprintf("Failed to marshal BSON: %v", err))
+		logging.Logger.Error(fmt.Sprintf("Failed to marshal BSON: %+v", err))
 		return nil, err
 	}
-	// logging.Logger.Debug(fmt.Sprintf("bsonBytes=%v", bsonBytes))
+	// logging.Logger.Debug(fmt.Sprintf("bsonBytes=%+v", bsonBytes))
 
 	// if err := bson.Unmarshal(bsonBytes, &model); err != nil {
-	// 	logging.Logger.Error(fmt.Sprintf("Failed to unmarshal BSON to struct: %v", err))
+	// 	logging.Logger.Error(fmt.Sprintf("Failed to unmarshal BSON to struct: %+v", err))
 	// 	return nil, err
 	// }
-	logging.Logger.Debug(fmt.Sprintf("model=%v", model))
+	logging.Logger.Debug(fmt.Sprintf("model=%+v", model))
 
 	return &model, nil
 }
 
 // Query the database for multiple documents.
 //
-// @Param collection The name of the collection to query.
+// @Param collectionName The name of the collection to query.
 //
 // @Param filter A BSON document specifying a filter to apply to the query.
 //
@@ -131,22 +131,22 @@ func Get[T any](collection string, id primitive.ObjectID) (*T, error) {
 // @Param limit The maximum number of documents to return in the query.
 //
 // @Return An array of the documents matching the query parameters, or an error.
-func Query[T any](collection string, filter bson.D, sort bson.D, projection bson.D, start int64, limit int) ([]*T, error) {
-	logging.Logger.Debug(fmt.Sprintf("Using '%s' collection on DB", collection),
+func Query[T any](collectionName string, filter bson.D, sort bson.D, projection bson.D, start int64, limit int) ([]*T, error) {
+	logging.Logger.Debug(fmt.Sprintf("Using '%s' collection on DB", collectionName),
 		"filter", filter,
 		"sort", sort,
 		"projection", projection,
 		"start", start,
 		"limit", limit)
-	coll := Db.Collection(collection)
+	collection := Db.Collection(collectionName)
 
-	logging.Logger.Info(fmt.Sprintf("Querying for '%s'...", collection))
+	logging.Logger.Info(fmt.Sprintf("Querying for '%s'...", collectionName))
 	// sortStage := bson.D{{"$sort", sort}}
-	// logging.Logger.Debug(fmt.Sprintf("sort=%v", sortStage))
+	// logging.Logger.Debug(fmt.Sprintf("sort=%+v", sortStage))
 	// skipStage := bson.D{{"$skip", math.Max(0, float64(start))}}
-	// logging.Logger.Debug(fmt.Sprintf("skip=%v", skipStage))
+	// logging.Logger.Debug(fmt.Sprintf("skip=%+v", skipStage))
 	// limitStage := bson.D{{"$limit", int(math.Max(0, math.Min(float64(limit), float64(constants.QueryMaxSize))))}}
-	// logging.Logger.Debug(fmt.Sprintf("limit=%v", limitStage))
+	// logging.Logger.Debug(fmt.Sprintf("limit=%+v", limitStage))
 	// pipeline := mongo.Pipeline{sortStage, skipStage, limitStage}
 
 	// If no sort key is specified, sort by ID
@@ -166,7 +166,7 @@ func Query[T any](collection string, filter bson.D, sort bson.D, projection bson
 		opts.SetProjection(projection)
 	}
 
-	cursor, err := coll.Find(context.TODO(), filter, opts)
+	cursor, err := collection.Find(context.TODO(), filter, opts)
 	logging.Logger.Debug("find results", "cursor", cursor, "err", err)
 	if err != nil {
 		logging.Logger.Error(fmt.Sprintf("Error while trying to find '%s' documents", collection), "error", err)
@@ -184,16 +184,16 @@ func Query[T any](collection string, filter bson.D, sort bson.D, projection bson
 	logging.Logger.Debug("query results", "results", results)
 	var models []*T
 	for _, r := range results {
-		logging.Logger.Debug(fmt.Sprintf("r=%v", r))
+		logging.Logger.Debug(fmt.Sprintf("r=%+v", r))
 		var model *T
 		bsonBytes, err := bson.Marshal(r)
 		if err != nil {
-			logging.Logger.Error(fmt.Sprintf("Failed to marshal BSON: %v", err))
+			logging.Logger.Error(fmt.Sprintf("Failed to marshal BSON: %+v", err))
 		}
-		logging.Logger.Debug(fmt.Sprintf("bsonBytes=%v", bsonBytes))
+		logging.Logger.Debug(fmt.Sprintf("bsonBytes=%+v", bsonBytes))
 
 		if err := bson.Unmarshal(bsonBytes, &model); err != nil {
-			logging.Logger.Error(fmt.Sprintf("Failed to unmarshal BSON to struct: %v", err))
+			logging.Logger.Error(fmt.Sprintf("Failed to unmarshal BSON to struct: %+v", err))
 		}
 
 		logging.Logger.Debug("appending model", "model", model)
