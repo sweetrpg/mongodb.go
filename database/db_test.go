@@ -185,11 +185,11 @@ func (suite *DbTestSuite) TestQuery() {
 	assert.Equal(suite.T(), limit, len(models))
 
 	model1 := models[0]
-	assert.Equal(suite.T(), "key-1", model1.Key)
+	assert.Equal(suite.T(), "query-key-1", model1.Key)
 	assert.Nil(suite.T(), model1.Value)
 
 	model2 := models[1]
-	assert.Equal(suite.T(), "key-2", model2.Key)
+	assert.Equal(suite.T(), "query-key-2", model2.Key)
 	assert.Nil(suite.T(), model2.Value)
 }
 
