@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -166,8 +167,8 @@ func (suite *DbTestSuite) TestQuery() {
 	// insert docs
 	for i := 0; i < 10; i++ {
 		doc := DBObject{
-			Key:   "key-" + string(i),
-			Value: "value-" + string(i),
+			Key:   fmt.Sprintf("key-%d", i),
+			Value: fmt.Sprintf("value-%d", i),
 		}
 		_, err := Insert[DBObject](os.Getenv("TEST_COLLECTION"), doc)
 		assert.NoError(suite.T(), err)
