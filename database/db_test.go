@@ -175,14 +175,14 @@ func (suite *DbTestSuite) TestQuery() {
 	}
 
 	filter := bson.D{{}}
-	sort := bson.D{{Key: "key", Value: "1"}} // Sort by key ascending
-	proj := bson.D{{Key: "key", Value: "1"}}
+	sort := bson.D{{Key: "key", Value: 1}} // Sort by key ascending
+	proj := bson.D{{Key: "key", Value: 1}}
 	var start int64 = 1
 	limit := 2
 	models, err := Query[DBObject](os.Getenv("TEST_COLLECTION"), filter, sort, proj, start, limit)
 	assert.NotNil(suite.T(), models)
 	assert.Nil(suite.T(), err)
-	assert.Equal(suite.T(), 2, len(models))
+	assert.Equal(suite.T(), limit, len(models))
 
 	model1 := models[0]
 	assert.Equal(suite.T(), "key-1", model1.Key)
