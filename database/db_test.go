@@ -186,11 +186,11 @@ func (suite *DbTestSuite) TestQuery() {
 
 	model1 := models[0]
 	assert.Equal(suite.T(), "query-key-1", model1.Key)
-	assert.Nil(suite.T(), model1.Value)
+	assert.Equal(suite.T(), "", model1.Value)
 
 	model2 := models[1]
 	assert.Equal(suite.T(), "query-key-2", model2.Key)
-	assert.Nil(suite.T(), model2.Value)
+	assert.Equal(suite.T(), "", model2.Value)
 }
 
 func TestDbTestSuite(t *testing.T) {
