@@ -175,8 +175,8 @@ func (suite *DbTestSuite) TestQuery() {
 	}
 
 	filter := bson.D{{}}
-	sort := bson.D{{"Key", "1"}} // Sort by key ascending
-	proj := bson.D{{"Key", "1"}}
+	sort := bson.D{{Key: "key", Value: "1"}} // Sort by key ascending
+	proj := bson.D{{Key: "key", Value: "1"}}
 	var start int64 = 1
 	limit := 2
 	models, err := Query[DBObject](os.Getenv("TEST_COLLECTION"), filter, sort, proj, start, limit)
