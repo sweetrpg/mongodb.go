@@ -169,7 +169,7 @@ func Query[T any](collectionName string, filter bson.D, sort bson.D, projection 
 	cursor, err := collection.Find(context.TODO(), filter, opts)
 	logging.Logger.Debug("find results", "cursor", cursor, "err", err)
 	if err != nil {
-		logging.Logger.Error(fmt.Sprintf("Error while trying to find '%s' documents", collection), "error", err)
+		logging.Logger.Error(fmt.Sprintf("Error while trying to find '%s' documents", collectionName), "error", err)
 		return nil, err
 	}
 
@@ -177,7 +177,7 @@ func Query[T any](collectionName string, filter bson.D, sort bson.D, projection 
 	err = cursor.All(context.TODO(), &results)
 	logging.Logger.Debug("cursor.All", "results", results, "err", err)
 	if err != nil {
-		logging.Logger.Error(fmt.Sprintf("Error while trying to fetch '%s' documents", collection), "error", err)
+		logging.Logger.Error(fmt.Sprintf("Error while trying to fetch '%s' documents", collectionName), "error", err)
 		return nil, err
 	}
 
