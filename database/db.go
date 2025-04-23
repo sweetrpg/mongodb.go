@@ -213,6 +213,7 @@ func Insert[T any](collection string, doc T) (primitive.ObjectID, error) {
 	logging.Logger.Info(fmt.Sprintf("Inserting new document into collection '%s'...", collection))
 
 	result, err := coll.InsertOne(context.TODO(), doc)
+	logging.Logger.Debug("insert result", "result", result, "err", err)
 	if err != nil {
 		logging.Logger.Error("Error while trying to insert documents into collection", "collection", collection, "error", err)
 		return primitive.NilObjectID, err
@@ -247,6 +248,7 @@ func Update[T any](collection string, id primitive.ObjectID, doc T) (int, int, e
 	logging.Logger.Debug("unmarshal document", "updates", update)
 
 	result, err := coll.UpdateOne(context.TODO(), filter, bson.D{{Key: "$set", Value: update}})
+	logging.Logger.Debug("update result", "result", result, "err", err)
 	if err != nil {
 		logging.Logger.Error("Error while trying to update document in collection", "collection", collection, "id", id, "error", err)
 		return 0, 0, err
@@ -264,6 +266,7 @@ func Delete[T any](collection string, id primitive.ObjectID) (bool, error) {
 	filter := bson.D{{Key: "_id", Value: id}}
 
 	result, err := coll.DeleteOne(context.TODO(), filter)
+	logging.Logger.Debug("delete result", "result", result, "err", err)
 	if err != nil {
 		logging.Logger.Error("Error while trying to delete documents from collection", "collection", collection, "id", id, "error", err)
 		return false, err
