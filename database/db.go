@@ -169,7 +169,7 @@ func Query[T any](collectionName string, filter bson.D, sort bson.D, projection 
 	cursor, err := collection.Find(context.TODO(), filter, opts)
 	logging.Logger.Debug("find results", "cursor", cursor, "err", err)
 	if err != nil {
-		logging.Logger.Error(fmt.Sprintf("Error while trying to find '%s' documents", collectionName), "error", err)
+		logging.Logger.Error("Error while trying to find documents", "collectionName", collectionName, "error", err)
 		return nil, err
 	}
 
@@ -177,23 +177,23 @@ func Query[T any](collectionName string, filter bson.D, sort bson.D, projection 
 	err = cursor.All(context.TODO(), &results)
 	logging.Logger.Debug("cursor.All", "results", results, "err", err)
 	if err != nil {
-		logging.Logger.Error(fmt.Sprintf("Error while trying to fetch '%s' documents", collectionName), "error", err)
+		logging.Logger.Error("Error while trying to fetch documents", "collectionName", collectionName, "error", err)
 		return nil, err
 	}
 
 	logging.Logger.Debug("query results", "results", results)
 	var models []*T
 	for _, r := range results {
-		logging.Logger.Debug(fmt.Sprintf("r=%+v", r))
+		logging.Logger.Debug("iterating over results", "r", r)
 		var model *T
 		bsonBytes, err := bson.Marshal(r)
 		if err != nil {
-			logging.Logger.Error(fmt.Sprintf("Failed to marshal BSON: %+v", err))
+			logging.Logger.Error("Failed to marshal BSON", "err", err)
 		}
-		logging.Logger.Debug(fmt.Sprintf("bsonBytes=%+v", bsonBytes))
+		logging.Logger.Debug("bson.Marshal", "bsonBytes", bsonBytes)
 
 		if err := bson.Unmarshal(bsonBytes, &model); err != nil {
-			logging.Logger.Error(fmt.Sprintf("Failed to unmarshal BSON to struct: %+v", err))
+			logging.Logger.Error("Failed to unmarshal BSON to struct", "err", err)
 		}
 
 		logging.Logger.Debug("appending model", "model", model)
@@ -205,17 +205,18 @@ func Query[T any](collectionName string, filter bson.D, sort bson.D, projection 
 	return models, nil
 }
 
-func Insert[T any](collection string, doc T) (primitive.ObjectID, error) {
-	logging.Logger.Debug(fmt.Sprintf("Using '%s' collection on DB", collection),
-		"doc", doc)
-	coll := Db.Collection(collection)
+func Insert[T any](collectionName string, doc T) (primitive.ObjectID, error) {
+	logging.Logger.Info("Using collection on DB", "collectionName", collectionName, "doc", doc)
+	collection := Db.Collection(collectionName)
 
-	logging.Logger.Info(fmt.Sprintf("Inserting new document into collection '%s'...", collection))
+	logging.Logger.Info("Inserting new document into collection...", "collectionName", collectionName)
 
-	result, err := coll.InsertOne(context.TODO(), doc)
+	opts := options.InsertOne().SetBypassDocumentValidation(true)
+
+	result, err := collection.InsertOne(context.TODO(), doc, opts)
 	logging.Logger.Debug("insert result", "result", result, "err", err)
 	if err != nil {
-		logging.Logger.Error("Error while trying to insert documents into collection", "collection", collection, "error", err)
+		logging.Logger.Error("Error while trying to insert documents into collection", "collectionName", collectionName, "error", err)
 		return primitive.NilObjectID, err
 	}
 
@@ -224,17 +225,16 @@ func Insert[T any](collection string, doc T) (primitive.ObjectID, error) {
 	return id, nil
 }
 
-func Update[T any](collection string, id primitive.ObjectID, doc T) (int, int, error) {
-	logging.Logger.Debug(fmt.Sprintf("Using '%s' collection on DB", collection),
-		"id", id,
-		"doc", doc)
-	coll := Db.Collection(collection)
+func Update[T any](collectionName string, id primitive.ObjectID, doc T) (int, int, error) {
+	logging.Logger.Info("Using collection on DB", "collectionName", collectionName, "id", id, "doc", doc)
+	collection := Db.Collection(collectionName)
 
 	filter := bson.D{{Key: "_id", Value: id}}
+	logging.Logger.Debug("update filter", "filter", filter)
 
 	data, err := bson.Marshal(doc) //   D{} // TODO:
 	if err != nil {
-		logging.Logger.Error("Error while trying prepare document for update in collection", "collection", collection, "id", id, "error", err)
+		logging.Logger.Error("Error while trying prepare document for update in collection", "collectionName", collectionName, "id", id, "error", err)
 		return 0, 0, err
 	}
 	logging.Logger.Debug("marshal document", "data", data)
@@ -242,15 +242,15 @@ func Update[T any](collection string, id primitive.ObjectID, doc T) (int, int, e
 	err = bson.Unmarshal(data, &update)
 	logging.Logger.Debug("unmarshaled", "update", update, "err", err)
 	if err != nil {
-		logging.Logger.Error("Error while trying prepare document for update in collection", "collection", collection, "id", id, "data", data, "error", err)
+		logging.Logger.Error("Error while trying prepare document for update in collection", "collectionName", collectionName, "id", id, "data", data, "error", err)
 		return 0, 0, err
 	}
 	logging.Logger.Debug("unmarshal document", "updates", update)
 
-	result, err := coll.UpdateOne(context.TODO(), filter, bson.D{{Key: "$set", Value: update}})
+	result, err := collection.UpdateOne(context.TODO(), filter, bson.D{{Key: "$set", Value: update}})
 	logging.Logger.Debug("update result", "result", result, "err", err)
 	if err != nil {
-		logging.Logger.Error("Error while trying to update document in collection", "collection", collection, "id", id, "error", err)
+		logging.Logger.Error("Error while trying to update document in collection", "collectionName", collectionName, "id", id, "error", err)
 		return 0, 0, err
 	}
 
@@ -258,17 +258,16 @@ func Update[T any](collection string, id primitive.ObjectID, doc T) (int, int, e
 	return int(result.MatchedCount), int(result.ModifiedCount), nil
 }
 
-func Delete[T any](collection string, id primitive.ObjectID) (bool, error) {
-	logging.Logger.Debug(fmt.Sprintf("Using '%s' collection on DB", collection),
-		"id", id)
-	coll := Db.Collection(collection)
+func Delete[T any](collectionName string, id primitive.ObjectID) (bool, error) {
+	logging.Logger.Info("Using collection on DB", "collectionName", collectionName, "id", id)
+	collection := Db.Collection(collectionName)
 
 	filter := bson.D{{Key: "_id", Value: id}}
 
-	result, err := coll.DeleteOne(context.TODO(), filter)
+	result, err := collection.DeleteOne(context.TODO(), filter)
 	logging.Logger.Debug("delete result", "result", result, "err", err)
 	if err != nil {
-		logging.Logger.Error("Error while trying to delete documents from collection", "collection", collection, "id", id, "error", err)
+		logging.Logger.Error("Error while trying to delete documents from collection", "collectionName", collectionName, "id", id, "error", err)
 		return false, err
 	}
 
