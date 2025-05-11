@@ -126,6 +126,7 @@ func buildDbURL() (*url.URL, string) <span class="cov8" title="1">{
         return dbUrl, dbName</span>
 }
 
+// SetupDatabase initializes the database connection and sets up the database instance.
 func SetupDatabase() <span class="cov8" title="1">{
         dbUrl, dbName := buildDbURL()
         logging.Logger.Info("Connecting to database", "url", dbUrl.Redacted())
@@ -138,6 +139,8 @@ func SetupDatabase() <span class="cov8" title="1">{
         Db = client.Database(dbName)</span>
 }
 
+// TeardownDatabase closes the connection to the database.
+// It should be called when the application is shutting down.
 func TeardownDatabase() <span class="cov0" title="0">{
         if client != nil </span><span class="cov0" title="0">{
                 if err := client.Disconnect(context.TODO()); err != nil </span><span class="cov0" title="0">{
@@ -146,6 +149,7 @@ func TeardownDatabase() <span class="cov0" title="0">{
         }
 }
 
+// Get a single document from the database.
 func Get[T any](collection string, id primitive.ObjectID) (*T, error) <span class="cov8" title="1">{
         logging.Logger.Debug(fmt.Sprintf("Using '%s' collection on DB", collection))
         coll := Db.Collection(collection)
@@ -283,6 +287,7 @@ func Query[T any](collectionName string, filter bson.D, sort bson.D, projection 
         return models, nil</span>
 }
 
+// Insert a new document into the database.
 func Insert[T any](collectionName string, doc T) (primitive.ObjectID, error) <span class="cov8" title="1">{
         logging.Logger.Info("Using collection on DB", "collectionName", collectionName, "doc", doc)
         collection := Db.Collection(collectionName)
@@ -303,6 +308,7 @@ func Insert[T any](collectionName string, doc T) (primitive.ObjectID, error) <sp
         return id, nil</span>
 }
 
+// Update a document in the database.
 func Update[T any](collectionName string, id primitive.ObjectID, doc T) (int, int, error) <span class="cov8" title="1">{
         logging.Logger.Info("Using collection on DB", "collectionName", collectionName, "id", id, "doc", doc)
         collection := Db.Collection(collectionName)
@@ -336,6 +342,7 @@ func Update[T any](collectionName string, id primitive.ObjectID, doc T) (int, in
         return int(result.MatchedCount), int(result.ModifiedCount), nil</span>
 }
 
+// Delete a document from the database.
 func Delete[T any](collectionName string, id primitive.ObjectID) (bool, error) <span class="cov8" title="1">{
         logging.Logger.Info("Using collection on DB", "collectionName", collectionName, "id", id)
         collection := Db.Collection(collectionName)
