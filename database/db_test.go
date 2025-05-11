@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"github.com/sweetrpg/common.go/logging"
-	"github.com/sweetrpg/db.go/constants"
+	"github.com/sweetrpg/mongodb.go/constants"
 	"go.mongodb.org/mongo-driver/bson"
 )
 

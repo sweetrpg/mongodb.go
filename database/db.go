@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/sweetrpg/common.go/logging"
-	"github.com/sweetrpg/db.go/constants"
+	"github.com/sweetrpg/mongodb.go/constants"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
