@@ -55,7 +55,7 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">github.com/sweetrpg/mongodb.go/database/db.go (79.2%)</option>
+				<option value="file0">github.com/sweetrpg/mongodb.go/database/db.go (79.7%)</option>
 				
 				</select>
 			</div>
@@ -238,12 +238,16 @@ func Query[T any](collectionName string, filter bson.D, sort bson.D, projection 
         // }
 
         opts := options.Find().
-                SetSort(sort).
                 SetSkip(start).
                 SetLimit(int64(limit))
         logging.Logger.Debug("find options", "opts", opts)
 
-        if len(projection) &gt; 0 </span><span class="cov8" title="1">{
+        if len(sort) &gt; 0 </span><span class="cov8" title="1">{
+                logging.Logger.Info("Setting sort", "sort", sort)
+                opts.SetSort(sort)
+        }</span>
+
+        <span class="cov8" title="1">if len(projection) &gt; 0 </span><span class="cov8" title="1">{
                 logging.Logger.Info("Setting projection", "projection", projection)
                 opts.SetProjection(projection)
         }</span>
