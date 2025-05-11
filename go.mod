@@ -1,4 +1,4 @@
-module github.com/sweetrpg/db.go
+module github.com/sweetrpg/mongodb.go
 
 go 1.24.2
 
