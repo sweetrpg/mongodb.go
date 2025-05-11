@@ -6,7 +6,7 @@
 [![PRs](https://img.shields.io/github/issues-pr/sweetrpg/db.go.svg)](https://img.shields.io/github/issues-pr/sweetrpg/db.go.svg)
 [![Dependabot](https://badgen.net/github/dependabot/sweetrpg/db.go)](https://badgen.net/github/dependabot/sweetrpg/db.go)
 
-Common data types for model and object packages.
+Database abstraction layer for accessing MongoDB.
 
 ## Documentation
 
