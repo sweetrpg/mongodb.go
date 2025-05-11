@@ -140,6 +140,13 @@ func Query[T any](collectionName string, filter bson.D, sort bson.D, projection 
 		"limit", limit)
 	collection := Db.Collection(collectionName)
 
+	if start < 0 {
+		return nil, fmt.Errorf("start must be greater than or equal to 0")
+	}
+	if limit < 0 {
+		return nil, fmt.Errorf("limit must be greater than or equal to 0")
+	}
+
 	logging.Logger.Info(fmt.Sprintf("Querying for '%s'...", collectionName))
 	// sortStage := bson.D{{"$sort", sort}}
 	// logging.Logger.Debug(fmt.Sprintf("sort=%+v", sortStage))
