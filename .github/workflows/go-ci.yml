@@ -120,7 +120,7 @@ jobs:
                     - repo: client.go
                     - repo: data-api
                     - repo: data-objects.go
-                    - repo: db.go
+                    - repo: mongodb.go
                     - repo: initiative-api
                     - repo: initiative-data.go
                     - repo: initiative-objects.go
