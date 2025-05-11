@@ -159,7 +159,7 @@ func (suite *DbTestSuite) TestGet() {
 	assert.Equal(suite.T(), "gotten-value", object.Value)
 }
 
-func (suite *DbTestSuite) TestQuery() {
+func (suite *DbTestSuite) TestQueryAll() {
 	os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
 	logging.Init()
 	SetupDatabase()
@@ -191,6 +191,193 @@ func (suite *DbTestSuite) TestQuery() {
 	model2 := models[1]
 	assert.Equal(suite.T(), "query-key-2", model2.Key)
 	assert.Equal(suite.T(), "", model2.Value)
+}
+
+func (suite *DbTestSuite) TestQueryNone() {
+	os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
+	logging.Init()
+	SetupDatabase()
+
+	// insert docs
+	for i := 0; i < 10; i++ {
+		doc := DBObject{
+			Key:   fmt.Sprintf("query-key-%d", i),
+			Value: fmt.Sprintf("query-value-%d", i),
+		}
+		_, err := Insert[DBObject](os.Getenv("TEST_COLLECTION"), doc)
+		assert.NoError(suite.T(), err)
+	}
+
+	filter := bson.D{}
+	sort := bson.D{}
+	proj := bson.D{}
+	var start int64 = 1
+	limit := 2
+	models, err := Query[DBObject](os.Getenv("TEST_COLLECTION"), filter, sort, proj, start, limit)
+	assert.NotNil(suite.T(), models)
+	assert.Nil(suite.T(), err)
+	assert.Equal(suite.T(), limit, len(models))
+
+	model1 := models[0]
+	assert.Equal(suite.T(), "query-key-1", model1.Key)
+	assert.Equal(suite.T(), "", model1.Value)
+
+	model2 := models[1]
+	assert.Equal(suite.T(), "query-key-2", model2.Key)
+	assert.Equal(suite.T(), "", model2.Value)
+}
+
+func (suite *DbTestSuite) TestQueryLimit0() {
+	os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
+	logging.Init()
+	SetupDatabase()
+
+	// insert docs
+	for i := 0; i < 10; i++ {
+		doc := DBObject{
+			Key:   fmt.Sprintf("query-key-%d", i),
+			Value: fmt.Sprintf("query-value-%d", i),
+		}
+		_, err := Insert[DBObject](os.Getenv("TEST_COLLECTION"), doc)
+		assert.NoError(suite.T(), err)
+	}
+
+	filter := bson.D{}
+	sort := bson.D{}
+	proj := bson.D{}
+	var start int64 = 1
+	limit := 0
+	models, err := Query[DBObject](os.Getenv("TEST_COLLECTION"), filter, sort, proj, start, limit)
+	assert.NotNil(suite.T(), models)
+	assert.Nil(suite.T(), err)
+	assert.Equal(suite.T(), limit, len(models))
+}
+
+func (suite *DbTestSuite) TestQuerySorted() {
+	os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
+	logging.Init()
+	SetupDatabase()
+
+	// insert docs
+	for i := 0; i < 10; i++ {
+		doc := DBObject{
+			Key:   fmt.Sprintf("query-key-%d", i),
+			Value: fmt.Sprintf("query-value-%d", i),
+		}
+		_, err := Insert[DBObject](os.Getenv("TEST_COLLECTION"), doc)
+		assert.NoError(suite.T(), err)
+	}
+
+	filter := bson.D{}
+	sort := bson.D{{Key: "key", Value: 1}} // Sort by key ascending
+	proj := bson.D{}
+	var start int64 = 1
+	limit := 2
+	models, err := Query[DBObject](os.Getenv("TEST_COLLECTION"), filter, sort, proj, start, limit)
+	assert.NotNil(suite.T(), models)
+	assert.Nil(suite.T(), err)
+	assert.Equal(suite.T(), limit, len(models))
+
+	model1 := models[0]
+	assert.Equal(suite.T(), "query-key-1", model1.Key)
+	assert.Equal(suite.T(), "", model1.Value)
+
+	model2 := models[1]
+	assert.Equal(suite.T(), "query-key-2", model2.Key)
+	assert.Equal(suite.T(), "", model2.Value)
+}
+
+func (suite *DbTestSuite) TestQueryFiltered() {
+	os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
+	logging.Init()
+	SetupDatabase()
+
+	// insert docs
+	for i := 0; i < 10; i++ {
+		doc := DBObject{
+			Key:   fmt.Sprintf("query-key-%d", i),
+			Value: fmt.Sprintf("query-value-%d", i),
+		}
+		_, err := Insert[DBObject](os.Getenv("TEST_COLLECTION"), doc)
+		assert.NoError(suite.T(), err)
+	}
+
+	filter := bson.D{{Key: "key", Value: bson.D{{Key: "$regex", Value: "^query-key-"}}}}
+	sort := bson.D{}
+	proj := bson.D{}
+	var start int64 = 1
+	limit := 2
+	models, err := Query[DBObject](os.Getenv("TEST_COLLECTION"), filter, sort, proj, start, limit)
+	assert.NotNil(suite.T(), models)
+	assert.Nil(suite.T(), err)
+	assert.Equal(suite.T(), limit, len(models))
+
+	model1 := models[0]
+	assert.Equal(suite.T(), "query-key-1", model1.Key)
+	assert.Equal(suite.T(), "", model1.Value)
+
+	model2 := models[1]
+	assert.Equal(suite.T(), "query-key-2", model2.Key)
+	assert.Equal(suite.T(), "", model2.Value)
+}
+
+func (suite *DbTestSuite) TestQueryProjected() {
+	os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
+	logging.Init()
+	SetupDatabase()
+
+	// insert docs
+	for i := 0; i < 10; i++ {
+		doc := DBObject{
+			Key:   fmt.Sprintf("query-key-%d", i),
+			Value: fmt.Sprintf("query-value-%d", i),
+		}
+		_, err := Insert[DBObject](os.Getenv("TEST_COLLECTION"), doc)
+		assert.NoError(suite.T(), err)
+	}
+
+	filter := bson.D{}
+	sort := bson.D{}
+	proj := bson.D{{Key: "key", Value: 1}}
+	var start int64 = 1
+	limit := 2
+	models, err := Query[DBObject](os.Getenv("TEST_COLLECTION"), filter, sort, proj, start, limit)
+	assert.NotNil(suite.T(), models)
+	assert.Nil(suite.T(), err)
+	assert.Equal(suite.T(), limit, len(models))
+
+	model1 := models[0]
+	assert.Equal(suite.T(), "query-key-1", model1.Key)
+	assert.Equal(suite.T(), "", model1.Value)
+
+	model2 := models[1]
+	assert.Equal(suite.T(), "query-key-2", model2.Key)
+	assert.Equal(suite.T(), "", model2.Value)
+}
+
+func (suite *DbTestSuite) TestQueryInvalidStart() {
+	os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
+	logging.Init()
+	SetupDatabase()
+
+	// insert docs
+	for i := 0; i < 10; i++ {
+		doc := DBObject{
+			Key:   fmt.Sprintf("query-key-%d", i),
+			Value: fmt.Sprintf("query-value-%d", i),
+		}
+		_, err := Insert[DBObject](os.Getenv("TEST_COLLECTION"), doc)
+		assert.NoError(suite.T(), err)
+	}
+
+	filter := bson.D{}
+	sort := bson.D{}
+	proj := bson.D{}
+	var start int64 = -1
+	limit := 2
+	models, err := Query[DBObject](os.Getenv("TEST_COLLECTION"), filter, sort, proj, start, limit)
+	assert.NotNil(suite.T(), err)
+	assert.Nil(suite.T(), models)
 }
 
 func TestDbTestSuite(t *testing.T) {
