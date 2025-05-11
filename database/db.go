@@ -55,6 +55,7 @@ func buildDbURL() (*url.URL, string) {
 	return dbUrl, dbName
 }
 
+// SetupDatabase initializes the database connection and sets up the database instance.
 func SetupDatabase() {
 	dbUrl, dbName := buildDbURL()
 	logging.Logger.Info("Connecting to database", "url", dbUrl.Redacted())
@@ -67,6 +68,8 @@ func SetupDatabase() {
 	Db = client.Database(dbName)
 }
 
+// TeardownDatabase closes the connection to the database.
+// It should be called when the application is shutting down.
 func TeardownDatabase() {
 	if client != nil {
 		if err := client.Disconnect(context.TODO()); err != nil {
@@ -75,6 +78,7 @@ func TeardownDatabase() {
 	}
 }
 
+// Get a single document from the database.
 func Get[T any](collection string, id primitive.ObjectID) (*T, error) {
 	logging.Logger.Debug(fmt.Sprintf("Using '%s' collection on DB", collection))
 	coll := Db.Collection(collection)
@@ -212,6 +216,7 @@ func Query[T any](collectionName string, filter bson.D, sort bson.D, projection 
 	return models, nil
 }
 
+// Insert a new document into the database.
 func Insert[T any](collectionName string, doc T) (primitive.ObjectID, error) {
 	logging.Logger.Info("Using collection on DB", "collectionName", collectionName, "doc", doc)
 	collection := Db.Collection(collectionName)
@@ -232,6 +237,7 @@ func Insert[T any](collectionName string, doc T) (primitive.ObjectID, error) {
 	return id, nil
 }
 
+// Update a document in the database.
 func Update[T any](collectionName string, id primitive.ObjectID, doc T) (int, int, error) {
 	logging.Logger.Info("Using collection on DB", "collectionName", collectionName, "id", id, "doc", doc)
 	collection := Db.Collection(collectionName)
@@ -265,6 +271,7 @@ func Update[T any](collectionName string, id primitive.ObjectID, doc T) (int, in
 	return int(result.MatchedCount), int(result.ModifiedCount), nil
 }
 
+// Delete a document from the database.
 func Delete[T any](collectionName string, id primitive.ObjectID) (bool, error) {
 	logging.Logger.Info("Using collection on DB", "collectionName", collectionName, "id", id)
 	collection := Db.Collection(collectionName)

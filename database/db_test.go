@@ -377,6 +377,7 @@ func (suite *DbTestSuite) TestQueryInvalidStart() {
 	assert.Nil(suite.T(), models)
 }
 
+// run the test suite
 func TestDbTestSuite(t *testing.T) {
 	suite.Run(t, new(DbTestSuite))
 }
