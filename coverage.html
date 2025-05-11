@@ -55,7 +55,7 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">github.com/sweetrpg/db.go/database/db.go (79.3%)</option>
+				<option value="file0">github.com/sweetrpg/db.go/database/db.go (79.2%)</option>
 				
 				</select>
 			</div>
@@ -211,7 +211,14 @@ func Query[T any](collectionName string, filter bson.D, sort bson.D, projection 
                 "limit", limit)
         collection := Db.Collection(collectionName)
 
-        logging.Logger.Info(fmt.Sprintf("Querying for '%s'...", collectionName))
+        if start &lt; 0 </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("start must be greater than or equal to 0")
+        }</span>
+        <span class="cov8" title="1">if limit &lt; 0 </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("limit must be greater than or equal to 0")
+        }</span>
+
+        <span class="cov8" title="1">logging.Logger.Info(fmt.Sprintf("Querying for '%s'...", collectionName))
         // sortStage := bson.D{{"$sort", sort}}
         // logging.Logger.Debug(fmt.Sprintf("sort=%+v", sortStage))
         // skipStage := bson.D{{"$skip", math.Max(0, float64(start))}}
