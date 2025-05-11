@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -260,14 +261,14 @@ func (suite *DbTestSuite) TestQuerySorted() {
 	// insert docs
 	for i := 0; i < 10; i++ {
 		doc := DBObject{
-			Key:   fmt.Sprintf("query-key-%d", i),
-			Value: fmt.Sprintf("query-value-%d", i),
+			Key:   fmt.Sprintf("sorted-key-%d", i),
+			Value: fmt.Sprintf("sorted-value-%d", i),
 		}
 		_, err := Insert[DBObject](os.Getenv("TEST_COLLECTION"), doc)
 		assert.NoError(suite.T(), err)
 	}
 
-	filter := bson.D{}
+	filter := bson.D{{Key: "key", Value: bson.D{{Key: "$regex", Value: "^sorted-key-"}}}}
 	sort := bson.D{{Key: "key", Value: 1}} // Sort by key ascending
 	proj := bson.D{}
 	var start int64 = 1
@@ -278,12 +279,12 @@ func (suite *DbTestSuite) TestQuerySorted() {
 	assert.Equal(suite.T(), limit, len(models))
 
 	model1 := models[0]
-	assert.Equal(suite.T(), "query-key-1", model1.Key)
-	assert.Equal(suite.T(), "query-value-1", model1.Value)
+	assert.Equal(suite.T(), "sorted-key-1", model1.Key)
+	assert.Equal(suite.T(), "sorted-value-1", model1.Value)
 
 	model2 := models[1]
-	assert.Equal(suite.T(), "query-key-2", model2.Key)
-	assert.Equal(suite.T(), "query-value-2", model2.Value)
+	assert.Equal(suite.T(), "sorted-key-2", model2.Key)
+	assert.Equal(suite.T(), "sorted-value-2", model2.Value)
 }
 
 func (suite *DbTestSuite) TestQueryFiltered() {
@@ -328,30 +329,27 @@ func (suite *DbTestSuite) TestQueryProjected() {
 	// insert docs
 	for i := 0; i < 10; i++ {
 		doc := DBObject{
-			Key:   fmt.Sprintf("query-key-%d", i),
-			Value: fmt.Sprintf("query-value-%d", i),
+			Key:   fmt.Sprintf("projected-key-%d", i),
+			Value: fmt.Sprintf("projected-value-%d", i),
 		}
 		_, err := Insert[DBObject](os.Getenv("TEST_COLLECTION"), doc)
 		assert.NoError(suite.T(), err)
 	}
 
-	filter := bson.D{}
+	filter := bson.D{{Key: "key", Value: bson.D{{Key: "$regex", Value: "^projected-key-"}}}}
 	sort := bson.D{}
 	proj := bson.D{{Key: "key", Value: 1}}
 	var start int64 = 1
-	limit := 2
+	limit := 5
 	models, err := Query[DBObject](os.Getenv("TEST_COLLECTION"), filter, sort, proj, start, limit)
 	assert.NotNil(suite.T(), models)
 	assert.Nil(suite.T(), err)
 	assert.Equal(suite.T(), limit, len(models))
 
-	model1 := models[0]
-	assert.Equal(suite.T(), "query-key-1", model1.Key)
-	assert.Equal(suite.T(), "query-value-1", model1.Value)
-
-	model2 := models[1]
-	assert.Equal(suite.T(), "query-key-2", model2.Key)
-	assert.Equal(suite.T(), "query-value-2", model2.Value)
+	for i := 0; i < len(models); i++ {
+		assert.True(suite.T(), strings.HasPrefix(models[i].Key, "projected-key-"))
+		assert.Equal(suite.T(), "", models[i].Value)
+	}
 }
 
 func (suite *DbTestSuite) TestQueryInvalidStart() {
