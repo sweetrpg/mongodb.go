@@ -5,7 +5,7 @@ go 1.24.2
 require (
 	github.com/stretchr/testify v1.11.1
 	github.com/sweetrpg/common.go v0.0.14
-	go.mongodb.org/mongo-driver v1.17.8
+	go.mongodb.org/mongo-driver v1.17.9
 )
 
 require (
