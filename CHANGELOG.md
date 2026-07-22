@@ -2,6 +2,18 @@
 
 <!--next-version-placeholder-->
 
+## [Unreleased]
+
+### Added
+
+- CONTRIBUTING.md, CODE_OF_CONDUCT.md, AGENTS.md/CLAUDE.md repo scaffolding.
+- MongoDB service in the PR workflow so `go test` can actually run against a live database on PRs.
+
+### Fixed
+
+- `Insert` no longer bypasses MongoDB document validation.
+- Removed dead/commented-out code and document-content logging in the database package.
+
 ## v0.0.145 (2024-10-27)
 
 
