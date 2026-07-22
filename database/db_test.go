@@ -23,18 +23,18 @@ type DBObject struct {
 }
 
 func (suite *DbTestSuite) SetupTest() {
-	os.Unsetenv(constants.DB_URI)
-	os.Unsetenv(constants.DB_NAME)
-	os.Unsetenv(constants.DB_HOST)
-	os.Unsetenv(constants.DB_SCHEME)
-	os.Unsetenv(constants.DB_USER)
-	os.Unsetenv(constants.DB_PW)
-	os.Unsetenv(constants.DB_PORT)
-	os.Unsetenv(constants.DB_OPTS)
+	_ = os.Unsetenv(constants.DB_URI)
+	_ = os.Unsetenv(constants.DB_NAME)
+	_ = os.Unsetenv(constants.DB_HOST)
+	_ = os.Unsetenv(constants.DB_SCHEME)
+	_ = os.Unsetenv(constants.DB_USER)
+	_ = os.Unsetenv(constants.DB_PW)
+	_ = os.Unsetenv(constants.DB_PORT)
+	_ = os.Unsetenv(constants.DB_OPTS)
 }
 
 func (suite *DbTestSuite) TestBuildURLFromURI() {
-	os.Setenv(constants.DB_URI, "mongo://user:pass@host:12345/db?opts=these")
+	_ = os.Setenv(constants.DB_URI, "mongo://user:pass@host:12345/db?opts=these")
 	dbUrl, dbName := buildDbURL()
 	assert.Equal(suite.T(), "mongo", dbUrl.Scheme)
 	assert.Equal(suite.T(), "user", dbUrl.User.Username())
@@ -45,13 +45,13 @@ func (suite *DbTestSuite) TestBuildURLFromURI() {
 }
 
 func (suite *DbTestSuite) TestBuildURLFromParts() {
-	os.Setenv(constants.DB_NAME, "db")
-	os.Setenv(constants.DB_HOST, "host")
-	os.Setenv(constants.DB_SCHEME, "mongo")
-	os.Setenv(constants.DB_USER, "user")
-	os.Setenv(constants.DB_PW, "pass")
-	os.Setenv(constants.DB_PORT, "12345")
-	os.Setenv(constants.DB_OPTS, "opts=these")
+	_ = os.Setenv(constants.DB_NAME, "db")
+	_ = os.Setenv(constants.DB_HOST, "host")
+	_ = os.Setenv(constants.DB_SCHEME, "mongo")
+	_ = os.Setenv(constants.DB_USER, "user")
+	_ = os.Setenv(constants.DB_PW, "pass")
+	_ = os.Setenv(constants.DB_PORT, "12345")
+	_ = os.Setenv(constants.DB_OPTS, "opts=these")
 
 	dbUrl, dbName := buildDbURL()
 	assert.Equal(suite.T(), "mongo", dbUrl.Scheme)
@@ -63,13 +63,13 @@ func (suite *DbTestSuite) TestBuildURLFromParts() {
 }
 
 func (suite *DbTestSuite) TestInvalidURL() {
-	os.Setenv(constants.DB_URI, "bogus!this is some b4d URI^#$%")
+	_ = os.Setenv(constants.DB_URI, "bogus!this is some b4d URI^#$%")
 
 	assert.Panics(suite.T(), func() { buildDbURL() }, "Should have panicked")
 }
 
 func (suite *DbTestSuite) TestInsert() {
-	os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
+	_ = os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
 	logging.Init()
 	SetupDatabase()
 
@@ -84,7 +84,7 @@ func (suite *DbTestSuite) TestInsert() {
 }
 
 func (suite *DbTestSuite) TestUpdate() {
-	os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
+	_ = os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
 	logging.Init()
 	SetupDatabase()
 
@@ -121,7 +121,7 @@ func (suite *DbTestSuite) TestUpdate() {
 }
 
 func (suite *DbTestSuite) TestDelete() {
-	os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
+	_ = os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
 	logging.Init()
 	SetupDatabase()
 
@@ -140,7 +140,7 @@ func (suite *DbTestSuite) TestDelete() {
 }
 
 func (suite *DbTestSuite) TestGet() {
-	os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
+	_ = os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
 	logging.Init()
 	SetupDatabase()
 
@@ -161,7 +161,7 @@ func (suite *DbTestSuite) TestGet() {
 }
 
 func (suite *DbTestSuite) TestQueryAll() {
-	os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
+	_ = os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
 	logging.Init()
 	SetupDatabase()
 
@@ -195,7 +195,7 @@ func (suite *DbTestSuite) TestQueryAll() {
 }
 
 func (suite *DbTestSuite) TestQueryNone() {
-	os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
+	_ = os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
 	logging.Init()
 	SetupDatabase()
 
@@ -229,7 +229,7 @@ func (suite *DbTestSuite) TestQueryNone() {
 }
 
 func (suite *DbTestSuite) TestQueryLimit0() {
-	os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
+	_ = os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
 	logging.Init()
 	SetupDatabase()
 
@@ -254,7 +254,7 @@ func (suite *DbTestSuite) TestQueryLimit0() {
 }
 
 func (suite *DbTestSuite) TestQuerySorted() {
-	os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
+	_ = os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
 	logging.Init()
 	SetupDatabase()
 
@@ -288,7 +288,7 @@ func (suite *DbTestSuite) TestQuerySorted() {
 }
 
 func (suite *DbTestSuite) TestQueryFiltered() {
-	os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
+	_ = os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
 	logging.Init()
 	SetupDatabase()
 
@@ -322,7 +322,7 @@ func (suite *DbTestSuite) TestQueryFiltered() {
 }
 
 func (suite *DbTestSuite) TestQueryProjected() {
-	os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
+	_ = os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
 	logging.Init()
 	SetupDatabase()
 
@@ -353,7 +353,7 @@ func (suite *DbTestSuite) TestQueryProjected() {
 }
 
 func (suite *DbTestSuite) TestQueryInvalidStart() {
-	os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
+	_ = os.Setenv(constants.DB_URI, os.Getenv("TEST_DB_URI"))
 	logging.Init()
 	SetupDatabase()
 

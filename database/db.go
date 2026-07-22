@@ -82,32 +82,18 @@ func TeardownDatabase() {
 func Get[T any](collection string, id primitive.ObjectID) (*T, error) {
 	logging.Logger.Debug(fmt.Sprintf("Using '%s' collection on DB", collection))
 	coll := Db.Collection(collection)
-	logging.Logger.Debug(fmt.Sprintf("collection=%+v", coll)) // TODO: remove
 
-	// objectId, err := primitive.ObjectIDFromHex(id)
-	// if err != nil {
-	// 	logging.Logger.Error(fmt.Sprintf("Unable to create ObjectID from %s: %s", id, err.Error()))
-	// 	return nil, err
-	// }
 	filter := bson.D{{Key: "_id", Value: id}}
 	var model T
 	err := coll.FindOne(context.TODO(), filter).Decode(&model)
-	// bsonBytes, err := bson.Marshal(result)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, nil
 		}
 
-		logging.Logger.Error(fmt.Sprintf("Failed to marshal BSON: %+v", err))
+		logging.Logger.Error(fmt.Sprintf("Failed to decode document: %+v", err))
 		return nil, err
 	}
-	// logging.Logger.Debug(fmt.Sprintf("bsonBytes=%+v", bsonBytes))
-
-	// if err := bson.Unmarshal(bsonBytes, &model); err != nil {
-	// 	logging.Logger.Error(fmt.Sprintf("Failed to unmarshal BSON to struct: %+v", err))
-	// 	return nil, err
-	// }
-	logging.Logger.Debug(fmt.Sprintf("model=%+v", model))
 
 	return &model, nil
 }
@@ -152,19 +138,10 @@ func Query[T any](collectionName string, filter bson.D, sort bson.D, projection 
 	}
 
 	logging.Logger.Info(fmt.Sprintf("Querying for '%s'...", collectionName))
-	// sortStage := bson.D{{"$sort", sort}}
-	// logging.Logger.Debug(fmt.Sprintf("sort=%+v", sortStage))
-	// skipStage := bson.D{{"$skip", math.Max(0, float64(start))}}
-	// logging.Logger.Debug(fmt.Sprintf("skip=%+v", skipStage))
-	// limitStage := bson.D{{"$limit", int(math.Max(0, math.Min(float64(limit), float64(constants.QueryMaxSize))))}}
-	// logging.Logger.Debug(fmt.Sprintf("limit=%+v", limitStage))
-	// pipeline := mongo.Pipeline{sortStage, skipStage, limitStage}
 
-	// If no sort key is specified, sort by ID
-	// if len(sort) == 0 {
-	// 	logging.Logger.Info("Set default sort on _id, since no sort was specified.")
-	// 	sort = bson.D{{"_id", 1}}
-	// }
+	if filter == nil {
+		filter = bson.D{}
+	}
 
 	opts := options.Find().
 		SetSkip(start).
@@ -214,7 +191,6 @@ func Query[T any](collectionName string, filter bson.D, sort bson.D, projection 
 		logging.Logger.Debug("appending model", "model", model)
 		models = append(models, model)
 	}
-	// err = bson.Unmarshal(result, &licenses)
 
 	logging.Logger.Debug("returning", "models", models)
 	return models, nil
@@ -222,14 +198,10 @@ func Query[T any](collectionName string, filter bson.D, sort bson.D, projection 
 
 // Insert a new document into the database.
 func Insert[T any](collectionName string, doc T) (primitive.ObjectID, error) {
-	logging.Logger.Info("Using collection on DB", "collectionName", collectionName, "doc", doc)
+	logging.Logger.Info("Inserting new document into collection...", "collectionName", collectionName)
 	collection := Db.Collection(collectionName)
 
-	logging.Logger.Info("Inserting new document into collection...", "collectionName", collectionName)
-
-	opts := options.InsertOne().SetBypassDocumentValidation(true)
-
-	result, err := collection.InsertOne(context.TODO(), doc, opts)
+	result, err := collection.InsertOne(context.TODO(), doc)
 	logging.Logger.Debug("insert result", "result", result, "err", err)
 	if err != nil {
 		logging.Logger.Error("Error while trying to insert documents into collection", "collectionName", collectionName, "error", err)
@@ -243,13 +215,13 @@ func Insert[T any](collectionName string, doc T) (primitive.ObjectID, error) {
 
 // Update a document in the database.
 func Update[T any](collectionName string, id primitive.ObjectID, doc T) (int, int, error) {
-	logging.Logger.Info("Using collection on DB", "collectionName", collectionName, "id", id, "doc", doc)
+	logging.Logger.Info("Updating document in collection...", "collectionName", collectionName, "id", id)
 	collection := Db.Collection(collectionName)
 
 	filter := bson.D{{Key: "_id", Value: id}}
 	logging.Logger.Debug("update filter", "filter", filter)
 
-	data, err := bson.Marshal(doc) //   D{} // TODO:
+	data, err := bson.Marshal(doc)
 	if err != nil {
 		logging.Logger.Error("Error while trying prepare document for update in collection", "collectionName", collectionName, "id", id, "error", err)
 		return 0, 0, err
