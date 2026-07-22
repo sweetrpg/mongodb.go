@@ -1,3 +1,10 @@
+
+## 0.0.193 - 2026-07-22
+
+### Documentation
+- Update README (#140)
+
+
 # Changelog
 
 <!--next-version-placeholder-->
