@@ -139,6 +139,10 @@ func Query[T any](collectionName string, filter bson.D, sort bson.D, projection 
 
 	logging.Logger.Info(fmt.Sprintf("Querying for '%s'...", collectionName))
 
+	if filter == nil {
+		filter = bson.D{}
+	}
+
 	opts := options.Find().
 		SetSkip(start).
 		SetLimit(int64(limit))
