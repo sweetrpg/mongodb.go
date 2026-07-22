@@ -55,15 +55,24 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">github.com/sweetrpg/mongodb.go/database/db.go (79.7%)</option>
+				<option value="file0">github.com/sweetrpg/mongodb.go/database/db.go (78.6%)</option>
 				
 				</select>
 			</div>
 			<div id="legend">
 				<span>not tracked</span>
 			
-				<span class="cov0">not covered</span>
-				<span class="cov8">covered</span>
+				<span class="cov0">no coverage</span>
+				<span class="cov1">low coverage</span>
+				<span class="cov2">*</span>
+				<span class="cov3">*</span>
+				<span class="cov4">*</span>
+				<span class="cov5">*</span>
+				<span class="cov6">*</span>
+				<span class="cov7">*</span>
+				<span class="cov8">*</span>
+				<span class="cov9">*</span>
+				<span class="cov10">high coverage</span>
 			
 			</div>
 		</div>
@@ -88,18 +97,18 @@ import (
 var Db *mongo.Database
 var client *mongo.Client
 
-func buildDbURL() (*url.URL, string) <span class="cov8" title="1">{
+func buildDbURL() (*url.URL, string) <span class="cov6" title="14">{
         dbUri, found := os.LookupEnv(constants.DB_URI)
-        if found </span><span class="cov8" title="1">{
+        if found </span><span class="cov6" title="13">{
                 dbUrl, err := url.Parse(dbUri)
-                if err != nil </span><span class="cov8" title="1">{
+                if err != nil </span><span class="cov1" title="1">{
                         panic(err)</span>
                 }
 
-                <span class="cov8" title="1">return dbUrl, dbUrl.Path[1:]</span>
+                <span class="cov6" title="12">return dbUrl, dbUrl.Path[1:]</span>
         }
 
-        <span class="cov8" title="1">dbScheme := os.Getenv(constants.DB_SCHEME)
+        <span class="cov1" title="1">dbScheme := os.Getenv(constants.DB_SCHEME)
         dbUser := os.Getenv(constants.DB_USER)
         dbPW := os.Getenv(constants.DB_PW)
         dbHost := os.Getenv(constants.DB_HOST)
@@ -108,13 +117,13 @@ func buildDbURL() (*url.URL, string) <span class="cov8" title="1">{
         dbName := os.Getenv(constants.DB_NAME)
 
         var host string
-        if portFound </span><span class="cov8" title="1">{
+        if portFound </span><span class="cov1" title="1">{
                 host = fmt.Sprintf("%s:%s", dbHost, dbPort)
         }</span> else<span class="cov0" title="0"> {
                 host = dbHost
         }</span>
 
-        <span class="cov8" title="1">dbUrl := &amp;url.URL{
+        <span class="cov1" title="1">dbUrl := &amp;url.URL{
                 Scheme:     dbScheme,
                 Host:       host,
                 User:       url.UserPassword(dbUser, dbPW),
@@ -127,7 +136,7 @@ func buildDbURL() (*url.URL, string) <span class="cov8" title="1">{
 }
 
 // SetupDatabase initializes the database connection and sets up the database instance.
-func SetupDatabase() <span class="cov8" title="1">{
+func SetupDatabase() <span class="cov6" title="11">{
         dbUrl, dbName := buildDbURL()
         logging.Logger.Info("Connecting to database", "url", dbUrl.Redacted())
         client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(dbUrl.String()))
@@ -135,7 +144,7 @@ func SetupDatabase() <span class="cov8" title="1">{
                 panic(err)</span>
         }
 
-        <span class="cov8" title="1">logging.Logger.Info("Setting up database", "dbName", dbName)
+        <span class="cov6" title="11">logging.Logger.Info("Setting up database", "dbName", dbName)
         Db = client.Database(dbName)</span>
 }
 
@@ -150,37 +159,23 @@ func TeardownDatabase() <span class="cov0" title="0">{
 }
 
 // Get a single document from the database.
-func Get[T any](collection string, id primitive.ObjectID) (*T, error) <span class="cov8" title="1">{
+func Get[T any](collection string, id primitive.ObjectID) (*T, error) <span class="cov3" title="3">{
         logging.Logger.Debug(fmt.Sprintf("Using '%s' collection on DB", collection))
         coll := Db.Collection(collection)
-        logging.Logger.Debug(fmt.Sprintf("collection=%+v", coll)) // TODO: remove
 
-        // objectId, err := primitive.ObjectIDFromHex(id)
-        // if err != nil {
-        //         logging.Logger.Error(fmt.Sprintf("Unable to create ObjectID from %s: %s", id, err.Error()))
-        //         return nil, err
-        // }
         filter := bson.D{{Key: "_id", Value: id}}
         var model T
         err := coll.FindOne(context.TODO(), filter).Decode(&amp;model)
-        // bsonBytes, err := bson.Marshal(result)
         if err != nil </span><span class="cov0" title="0">{
                 if err == mongo.ErrNoDocuments </span><span class="cov0" title="0">{
                         return nil, nil
                 }</span>
 
-                <span class="cov0" title="0">logging.Logger.Error(fmt.Sprintf("Failed to marshal BSON: %+v", err))
+                <span class="cov0" title="0">logging.Logger.Error(fmt.Sprintf("Failed to decode document: %+v", err))
                 return nil, err</span>
         }
-        // logging.Logger.Debug(fmt.Sprintf("bsonBytes=%+v", bsonBytes))
 
-        // if err := bson.Unmarshal(bsonBytes, &amp;model); err != nil {
-        //         logging.Logger.Error(fmt.Sprintf("Failed to unmarshal BSON to struct: %+v", err))
-        //         return nil, err
-        // }
-        <span class="cov8" title="1">logging.Logger.Debug(fmt.Sprintf("model=%+v", model))
-
-        return &amp;model, nil</span>
+        <span class="cov3" title="3">return &amp;model, nil</span>
 }
 
 // Query the database for multiple documents.
@@ -206,7 +201,7 @@ func Get[T any](collection string, id primitive.ObjectID) (*T, error) <span clas
 // @Param limit The maximum number of documents to return in the query.
 //
 // @Return An array of the documents matching the query parameters, or an error.
-func Query[T any](collectionName string, filter bson.D, sort bson.D, projection bson.D, start int64, limit int) ([]*T, error) <span class="cov8" title="1">{
+func Query[T any](collectionName string, filter bson.D, sort bson.D, projection bson.D, start int64, limit int) ([]*T, error) <span class="cov5" title="7">{
         logging.Logger.Debug(fmt.Sprintf("Using '%s' collection on DB", collectionName),
                 "filter", filter,
                 "sort", sort,
@@ -215,51 +210,42 @@ func Query[T any](collectionName string, filter bson.D, sort bson.D, projection 
                 "limit", limit)
         collection := Db.Collection(collectionName)
 
-        if start &lt; 0 </span><span class="cov8" title="1">{
+        if start &lt; 0 </span><span class="cov1" title="1">{
                 return nil, fmt.Errorf("start must be greater than or equal to 0")
         }</span>
-        <span class="cov8" title="1">if limit &lt; 0 </span><span class="cov0" title="0">{
+        <span class="cov4" title="6">if limit &lt; 0 </span><span class="cov0" title="0">{
                 return nil, fmt.Errorf("limit must be greater than or equal to 0")
         }</span>
 
-        <span class="cov8" title="1">logging.Logger.Info(fmt.Sprintf("Querying for '%s'...", collectionName))
-        // sortStage := bson.D{{"$sort", sort}}
-        // logging.Logger.Debug(fmt.Sprintf("sort=%+v", sortStage))
-        // skipStage := bson.D{{"$skip", math.Max(0, float64(start))}}
-        // logging.Logger.Debug(fmt.Sprintf("skip=%+v", skipStage))
-        // limitStage := bson.D{{"$limit", int(math.Max(0, math.Min(float64(limit), float64(constants.QueryMaxSize))))}}
-        // logging.Logger.Debug(fmt.Sprintf("limit=%+v", limitStage))
-        // pipeline := mongo.Pipeline{sortStage, skipStage, limitStage}
+        <span class="cov4" title="6">logging.Logger.Info(fmt.Sprintf("Querying for '%s'...", collectionName))
 
-        // If no sort key is specified, sort by ID
-        // if len(sort) == 0 {
-        //         logging.Logger.Info("Set default sort on _id, since no sort was specified.")
-        //         sort = bson.D{{"_id", 1}}
-        // }
+        if filter == nil </span><span class="cov0" title="0">{
+                filter = bson.D{}
+        }</span>
 
-        opts := options.Find().
+        <span class="cov4" title="6">opts := options.Find().
                 SetSkip(start).
                 SetLimit(int64(limit))
         logging.Logger.Debug("find options", "opts", opts)
 
-        if len(sort) &gt; 0 </span><span class="cov8" title="1">{
+        if len(sort) &gt; 0 </span><span class="cov2" title="2">{
                 logging.Logger.Info("Setting sort", "sort", sort)
                 opts.SetSort(sort)
         }</span>
 
-        <span class="cov8" title="1">if len(projection) &gt; 0 </span><span class="cov8" title="1">{
+        <span class="cov4" title="6">if len(projection) &gt; 0 </span><span class="cov2" title="2">{
                 logging.Logger.Info("Setting projection", "projection", projection)
                 opts.SetProjection(projection)
         }</span>
 
-        <span class="cov8" title="1">cursor, err := collection.Find(context.TODO(), filter, opts)
+        <span class="cov4" title="6">cursor, err := collection.Find(context.TODO(), filter, opts)
         logging.Logger.Debug("find results", "cursor", cursor, "err", err)
         if err != nil </span><span class="cov0" title="0">{
                 logging.Logger.Error("Error while trying to find documents", "collectionName", collectionName, "error", err)
                 return nil, err
         }</span>
 
-        <span class="cov8" title="1">var results []*T
+        <span class="cov4" title="6">var results []*T
         err = cursor.All(context.TODO(), &amp;results)
         logging.Logger.Debug("cursor.All", "results", results, "err", err)
         if err != nil </span><span class="cov0" title="0">{
@@ -267,65 +253,60 @@ func Query[T any](collectionName string, filter bson.D, sort bson.D, projection 
                 return nil, err
         }</span>
 
-        <span class="cov8" title="1">logging.Logger.Debug("query results", "results", results)
+        <span class="cov4" title="6">logging.Logger.Debug("query results", "results", results)
         var models []*T
-        for _, r := range results </span><span class="cov8" title="1">{
+        for _, r := range results </span><span class="cov9" title="54">{
                 logging.Logger.Debug("iterating over results", "r", r)
                 var model *T
                 bsonBytes, err := bson.Marshal(r)
                 if err != nil </span><span class="cov0" title="0">{
                         logging.Logger.Error("Failed to marshal BSON", "err", err)
                 }</span>
-                <span class="cov8" title="1">logging.Logger.Debug("bson.Marshal", "bsonBytes", bsonBytes)
+                <span class="cov9" title="54">logging.Logger.Debug("bson.Marshal", "bsonBytes", bsonBytes)
 
                 if err := bson.Unmarshal(bsonBytes, &amp;model); err != nil </span><span class="cov0" title="0">{
                         logging.Logger.Error("Failed to unmarshal BSON to struct", "err", err)
                 }</span>
 
-                <span class="cov8" title="1">logging.Logger.Debug("appending model", "model", model)
+                <span class="cov9" title="54">logging.Logger.Debug("appending model", "model", model)
                 models = append(models, model)</span>
         }
-        // err = bson.Unmarshal(result, &amp;licenses)
 
-        <span class="cov8" title="1">logging.Logger.Debug("returning", "models", models)
+        <span class="cov4" title="6">logging.Logger.Debug("returning", "models", models)
         return models, nil</span>
 }
 
 // Insert a new document into the database.
-func Insert[T any](collectionName string, doc T) (primitive.ObjectID, error) <span class="cov8" title="1">{
-        logging.Logger.Info("Using collection on DB", "collectionName", collectionName, "doc", doc)
+func Insert[T any](collectionName string, doc T) (primitive.ObjectID, error) <span class="cov10" title="74">{
+        logging.Logger.Info("Inserting new document into collection...", "collectionName", collectionName)
         collection := Db.Collection(collectionName)
 
-        logging.Logger.Info("Inserting new document into collection...", "collectionName", collectionName)
-
-        opts := options.InsertOne().SetBypassDocumentValidation(true)
-
-        result, err := collection.InsertOne(context.TODO(), doc, opts)
+        result, err := collection.InsertOne(context.TODO(), doc)
         logging.Logger.Debug("insert result", "result", result, "err", err)
         if err != nil </span><span class="cov0" title="0">{
                 logging.Logger.Error("Error while trying to insert documents into collection", "collectionName", collectionName, "error", err)
                 return primitive.NilObjectID, err
         }</span>
 
-        <span class="cov8" title="1">id, ok := result.InsertedID.(primitive.ObjectID)
+        <span class="cov10" title="74">id, ok := result.InsertedID.(primitive.ObjectID)
         logging.Logger.Info("Document inserted", "id", id, "ok", ok)
         return id, nil</span>
 }
 
 // Update a document in the database.
-func Update[T any](collectionName string, id primitive.ObjectID, doc T) (int, int, error) <span class="cov8" title="1">{
-        logging.Logger.Info("Using collection on DB", "collectionName", collectionName, "id", id, "doc", doc)
+func Update[T any](collectionName string, id primitive.ObjectID, doc T) (int, int, error) <span class="cov1" title="1">{
+        logging.Logger.Info("Updating document in collection...", "collectionName", collectionName, "id", id)
         collection := Db.Collection(collectionName)
 
         filter := bson.D{{Key: "_id", Value: id}}
         logging.Logger.Debug("update filter", "filter", filter)
 
-        data, err := bson.Marshal(doc) //   D{} // TODO:
+        data, err := bson.Marshal(doc)
         if err != nil </span><span class="cov0" title="0">{
                 logging.Logger.Error("Error while trying prepare document for update in collection", "collectionName", collectionName, "id", id, "error", err)
                 return 0, 0, err
         }</span>
-        <span class="cov8" title="1">logging.Logger.Debug("marshal document", "data", data)
+        <span class="cov1" title="1">logging.Logger.Debug("marshal document", "data", data)
         var update bson.D
         err = bson.Unmarshal(data, &amp;update)
         logging.Logger.Debug("unmarshaled", "update", update, "err", err)
@@ -333,7 +314,7 @@ func Update[T any](collectionName string, id primitive.ObjectID, doc T) (int, in
                 logging.Logger.Error("Error while trying prepare document for update in collection", "collectionName", collectionName, "id", id, "data", data, "error", err)
                 return 0, 0, err
         }</span>
-        <span class="cov8" title="1">logging.Logger.Debug("unmarshal document", "updates", update)
+        <span class="cov1" title="1">logging.Logger.Debug("unmarshal document", "updates", update)
 
         result, err := collection.UpdateOne(context.TODO(), filter, bson.D{{Key: "$set", Value: update}})
         logging.Logger.Debug("update result", "result", result, "err", err)
@@ -342,12 +323,12 @@ func Update[T any](collectionName string, id primitive.ObjectID, doc T) (int, in
                 return 0, 0, err
         }</span>
 
-        <span class="cov8" title="1">logging.Logger.Info("Document updated", "id", id, "matched", result.MatchedCount, "modified", result.ModifiedCount)
+        <span class="cov1" title="1">logging.Logger.Info("Document updated", "id", id, "matched", result.MatchedCount, "modified", result.ModifiedCount)
         return int(result.MatchedCount), int(result.ModifiedCount), nil</span>
 }
 
 // Delete a document from the database.
-func Delete[T any](collectionName string, id primitive.ObjectID) (bool, error) <span class="cov8" title="1">{
+func Delete[T any](collectionName string, id primitive.ObjectID) (bool, error) <span class="cov1" title="1">{
         logging.Logger.Info("Using collection on DB", "collectionName", collectionName, "id", id)
         collection := Db.Collection(collectionName)
 
@@ -360,7 +341,7 @@ func Delete[T any](collectionName string, id primitive.ObjectID) (bool, error) <
                 return false, err
         }</span>
 
-        <span class="cov8" title="1">logging.Logger.Info("Deleted document", "count", result.DeletedCount)
+        <span class="cov1" title="1">logging.Logger.Info("Deleted document", "count", result.DeletedCount)
         return (result.DeletedCount &gt; 0), nil</span>
 }
 </pre>
